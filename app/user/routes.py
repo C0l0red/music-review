@@ -6,11 +6,10 @@ user = Blueprint("user", __name__)
 
 @user.route("/profile", methods=["GET", "POST"])
 def profile():
-    form = ProfileForm()
+    form = ProfileForm(obj=current_user)
 
     if form.validate_on_submit():
         pass
 
     return render_template("profile.html", form=form)
 
-    

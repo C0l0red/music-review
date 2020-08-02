@@ -46,6 +46,7 @@ class Artist(db.Model):
     id = db.Column(db.Integer, primary_key=True)
     public_id = db.Column(db.String(15), default=make_uuid)
     name = db.Column(db.String(50), nullable=False)
+    reviews = db.relationship("Review", backref="artist", lazy=True)
     songs = db.relationship("Song", backref="artist", lazy=True)
     features = db.relationship("Song", secondary='features', backref="featuring", lazy=True)
     albums = db.relationship("Album", backref="artist", lazy=True)
@@ -58,6 +59,7 @@ class Album(db.Model):
     id = db.Column(db.Integer, primary_key=True)
     public_id = db.Column(db.String(15), default=make_uuid)
     name = db.Column(db.String(60), nullable=False)
+    reviews = db.relationship("Review", backref="artist", lazy=True)
     year = db.Column(db.Integer)
     tracks = db.relationship("Song", backref="album", lazy=False)
 
@@ -71,6 +73,7 @@ class Song(db.Model):
     id = db.Column(db.Integer, primary_key=True)
     public_id = db.Column(db.String(15), default=make_uuid)
     name = db.Column(db.String(60), nullable=False)
+    reviews = db.relationship("Review", backref="artist", lazy=True)
     year = db.Column(db.Integer)
     
     album_id = db.Column(db.Integer, db.ForeignKey("album.id"), nullable=False)
@@ -87,4 +90,13 @@ class Genre(db.Model):
 
     def __repr__(self):
         return self.name
+
+class Review(db.Model):
+    id = db.Column(db.Integer, primary_key=True)
+    text = db.Column(db.Text, nullable=False)
+    song_id = db.Column(db.Integer, db.ForeignKey("song.id"))
+    album_id = db.Column(db.Integer, db.ForeignKey("album.id"))
+    artist_id = db.Column(db.Integer, db.ForeignKey("artist.id"))
+
+    
 

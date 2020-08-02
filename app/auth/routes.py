@@ -2,6 +2,7 @@ from flask import current_app, render_template, redirect, Blueprint, url_for
 from app import db, login_manager
 from .forms import RegisterForm, LoginForm, ResetRequestForm, PasswordResetForm
 from flask_login import login_required, login_user, logout_user, current_user
+from app.models import User
 
 auth = Blueprint("auth", __name__)
 
@@ -10,7 +11,12 @@ def register():
     form = RegisterForm()
 
     if form.validate_on_submit():
-        pass
+        new_user = User(username=form.username.data, email=form.email.data)
+        new_user.set_password(form.password.data)
+        db.session.add(new_user)
+        db.session.commit()
+
+        return redirect(url_for("auth.login"))
 
     return render_template("register.html", form=form)
 
@@ -20,7 +26,10 @@ def login():
     form = LoginForm()
 
     if form.validate_on_submit():
-        pass
+        user = User.query.filter_by(username=form.username.data)
+        login_user(user)
+        
+        return redirect(url_for('review.home'))
 
     return render_template('login.html', form=form)
 
