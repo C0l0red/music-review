@@ -41,11 +41,52 @@ class User(db.Model):
 
     def create_token(self):
         token = jwt.encode({"username":self.username, "exp": datetime.utcnow() + timedelta(minutes=30)}, app.config["SECRET_KEY"])
+        return token.decode("UTF-8")
+
+    @staticmethod
+    def validate_token(token):
+        try:
+            data = jwt.decode(token, app.config["SECRET_KEY"])
+            current_user = User.query.filter_by(username=data['username']).first()
+        except:
+            return None
+        
+        return current_user   
+
+class Song(db.Model):
+    id = db.Column(db.Integer, primary_key=True)
+    public_id = db.Column(db.String(15), default=make_uuid)
+    name = db.Column(db.String(60), nullable=False)
+    year = db.Column(db.Integer)
+    
+    reviews = db.relationship("Review", backref="artist", lazy=True)
+    album_id = db.Column(db.Integer, db.ForeignKey("album.id"), nullable=False)
+    artist_id = db.Column(db.Integer, db.ForeignKey('artist.id'), nullable=False)
+
+    def __repr__(self):
+        return self.name 
+
+
+class Album(db.Model):
+    id = db.Column(db.Integer, primary_key=True)
+    public_id = db.Column(db.String(15), default=make_uuid)
+    name = db.Column(db.String(60), nullable=False)
+    
+    year = db.Column(db.Integer)
+    tracks = db.relationship("Song", backref="album", lazy=False)
+    reviews = db.relationship("Review", backref="artist", lazy=True)
+    genre_id = db.Column(db.Integer, db.ForeignKey("genre.id"), nullable=False)
+    artist_id = db.Column(db.Integer, db.ForeignKey('artist.id'), nullable=False)
+
+    def __repr__(self):
+        return self.name
+
 
 class Artist(db.Model):
     id = db.Column(db.Integer, primary_key=True)
     public_id = db.Column(db.String(15), default=make_uuid)
     name = db.Column(db.String(50), nullable=False)
+
     reviews = db.relationship("Review", backref="artist", lazy=True)
     songs = db.relationship("Song", backref="artist", lazy=True)
     features = db.relationship("Song", secondary='features', backref="featuring", lazy=True)
@@ -55,32 +96,6 @@ class Artist(db.Model):
     def __repr__(self):
         return self.name
 
-class Album(db.Model):
-    id = db.Column(db.Integer, primary_key=True)
-    public_id = db.Column(db.String(15), default=make_uuid)
-    name = db.Column(db.String(60), nullable=False)
-    reviews = db.relationship("Review", backref="artist", lazy=True)
-    year = db.Column(db.Integer)
-    tracks = db.relationship("Song", backref="album", lazy=False)
-
-    genre_id = db.Column(db.Integer, db.ForeignKey("genre.id"), nullable=False)
-    artist_id = db.Column(db.Integer, db.ForeignKey('artist.id'), nullable=False)
-
-    def __repr__(self):
-        return self.name
-
-class Song(db.Model):
-    id = db.Column(db.Integer, primary_key=True)
-    public_id = db.Column(db.String(15), default=make_uuid)
-    name = db.Column(db.String(60), nullable=False)
-    reviews = db.relationship("Review", backref="artist", lazy=True)
-    year = db.Column(db.Integer)
-    
-    album_id = db.Column(db.Integer, db.ForeignKey("album.id"), nullable=False)
-    artist_id = db.Column(db.Integer, db.ForeignKey('artist.id'), nullable=False)
-
-    def __repr__(self):
-        return self.name
 
 class Genre(db.Model):
     id = db.Column(db.Integer, primary_key=True)
@@ -91,12 +106,25 @@ class Genre(db.Model):
     def __repr__(self):
         return self.name
 
-class Review(db.Model):
+
+class SongReview(db.Model):
     id = db.Column(db.Integer, primary_key=True)
     text = db.Column(db.Text, nullable=False)
-    song_id = db.Column(db.Integer, db.ForeignKey("song.id"))
-    album_id = db.Column(db.Integer, db.ForeignKey("album.id"))
-    artist_id = db.Column(db.Integer, db.ForeignKey("artist.id"))
+    song_id = db.Column(db.String(200))
+    song_offline_id = db.Column(db.Integer, db.ForeignKey("song.id"))
+
+
+class AlbumReview(db.Model):
+    id = db.Column(db.Integer, primary_key=True)
+    review = db.Column(db.Text, nullable=False)
+    album_id = db.Column(db.String(200))
+    album_offline_id = db.Column(db.Integer, db.ForeignKey("album.id"))
+
+class ArtistReview(db.Model):
+    id = db.Column(db.Integer, primary_key=True)
+    review = db.Column(db.Text, nullable=False)
+    artist_id = db.Column(db.String(200))
+    artist_offline_id = db.Column(db.Integer, db.ForeignKey("artist.id"))
 
     
 

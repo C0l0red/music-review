@@ -3,6 +3,7 @@ from app import db, login_manager
 from .forms import RegisterForm, LoginForm, ResetRequestForm, PasswordResetForm
 from flask_login import login_required, login_user, logout_user, current_user
 from app.models import User
+from app.utils import reset_email
 
 auth = Blueprint("auth", __name__)
 
@@ -44,14 +45,17 @@ def reset_request():
     form = ResetRequestForm()
 
     if form.validate_on_submit():
-        pass
+        user = User.query.filter_by(email=form.email.data)
+
+        reset_email(user)
+        return redirect("reset_request")
 
     return render_template("reset-request.html", form=form)
 
-@auth.route("reset-password", methods=["GET", "POST"])
-def reset_password():
+@auth.route("reset-password/<str:token>", methods=["GET", "POST"])
+def reset_password(token):
     form = PasswordResetForm()
-
+    form.user = token.decode
     if form.validate_on_submit():
         pass
 
