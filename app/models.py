@@ -51,7 +51,20 @@ class User(db.Model):
         except:
             return None
         
-        return current_user   
+        return current_user  
+
+class Profile(db.Model):
+    id = db.Column(db.Integer, primary_key=True)
+    user_id = db.Column(db.Integer, db.ForeignKey("user.id"), nullable=False)
+
+    favorite_song_reviews = db.relationship("SongReview", secondary="favorited_song_reviews", backref="favorited_users", lazy=True)
+    favorite_album_reviews = db.relationship("AlbumReview", secondary="favorited_album_reviews", backref="favorited_albums", lazy=True)
+    favorite_artist_reviews = db.relationship("ArtistReview", secondary="favorited_artist_reviews", backref="favorited_artists", lazy=True)
+
+    song_reviews = db.relationship("SongReview", backref="profile", lazy=True)
+    album_reviews = db.relationship("AlbumReview", backref="profile", lazy=True)
+    artist_reviews = db.relationship("ArtistReview", backref="profile", lazy=True)
+
 
 class Song(db.Model):
     id = db.Column(db.Integer, primary_key=True)
@@ -112,6 +125,7 @@ class SongReview(db.Model):
     text = db.Column(db.Text, nullable=False)
     song_id = db.Column(db.String(200))
     song_offline_id = db.Column(db.Integer, db.ForeignKey("song.id"))
+    profile_id = db.Column(db.Integer, db.ForeignKey("profile.id"), nullable=False)
 
 
 class AlbumReview(db.Model):
@@ -119,12 +133,14 @@ class AlbumReview(db.Model):
     review = db.Column(db.Text, nullable=False)
     album_id = db.Column(db.String(200))
     album_offline_id = db.Column(db.Integer, db.ForeignKey("album.id"))
+    profile_id = db.Column(db.Integer, db.ForeignKey("profile.id"), nullable=False)
 
 class ArtistReview(db.Model):
     id = db.Column(db.Integer, primary_key=True)
     review = db.Column(db.Text, nullable=False)
     artist_id = db.Column(db.String(200))
     artist_offline_id = db.Column(db.Integer, db.ForeignKey("artist.id"))
+    profile_id = db.Column(db.Integer, db.ForeignKey("profile.id"), nullable=False)
 
     
 

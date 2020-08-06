@@ -1,9 +1,10 @@
-from flask import current_app, render_template, redirect, Blueprint, url_for
+from flask import current_app as app, render_template, redirect, Blueprint, url_for
 from app import db, login_manager
 from .forms import RegisterForm, LoginForm, ResetRequestForm, PasswordResetForm
 from flask_login import login_required, login_user, logout_user, current_user
 from app.models import User
 from app.utils import reset_email
+import jwt
 
 auth = Blueprint("auth", __name__)
 
@@ -55,8 +56,14 @@ def reset_request():
 @auth.route("reset-password/<str:token>", methods=["GET", "POST"])
 def reset_password(token):
     form = PasswordResetForm()
-    form.user = token.decode
+    username = jwt.decode(token, app.secret_key)
+    user = User.query.filter_by(username=username).first_or_404()
+
+    form.user = user
     if form.validate_on_submit():
-        pass
+        user.set_password(form.password)
+        db.sesion.commit()
+        
+        return redirect(url_for("auth.login"))
 
     return render_template("reset-password.html", form=form)
