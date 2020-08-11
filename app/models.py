@@ -73,6 +73,7 @@ class Song(db.Model):
     year = db.Column(db.Integer)
     
     reviews = db.relationship("Review", backref="artist", lazy=True)
+    features_id = db.Column(db.Integer, db.ForeignKey("artist.id"))
     album_id = db.Column(db.Integer, db.ForeignKey("album.id"), nullable=False)
     artist_id = db.Column(db.Integer, db.ForeignKey('artist.id'), nullable=False)
 
