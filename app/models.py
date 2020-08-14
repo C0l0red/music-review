@@ -5,6 +5,8 @@ import jwt
 
 make_uuid = (lambda: uuid4().hex.upper()[0:15])
 
+
+
 features = db.Table("features", 
     db.Column("song_id", db.Integer,db.ForeignKey('song.id'), primary_key=True),
     db.Column("artist_id", db.Integer, db.ForeignKey("artist.id"), primary_key=True)
@@ -22,27 +24,54 @@ album_genre = db.Table("album_genre",
     )
 """
 
+
+# User Blueprint models
+
+## User Model for the Users.
+## It consists of an id, public id, username, email, password
+
 class User(db.Model):
     id = db.Column(db.Integer, primary_key=True)
     public_id = db.Column(db.String(15), default=make_uuid)
     username = db.Column(db.String(50), nullable=False)
     email = db.Column(db.String(120))
-    password = db.Column(db.String(80), nullable=False)
+    password = db.Column(db.String(80), nullable=False)#passwords are saved are encrypted at object creation
 
+    """
+    This method makes use of a dunder to change the represenation of the User Model to display the username as opposed 
+    to the memory location
+    """
     def __repr__(self):
         return self.username
 
+    """
+    This method sets the User's password to an encrypted version of the entered "password" string
+    """
     def set_password(self, password):
         hash_ = generate_password_hash(password, method="sha256")
         self.password = hash_
 
+    """
+    This method verifies the User's password by comparing the "password" argument with the User object's password
+    It returns a boolean
+    """
     def check_password(self, password):
         return check_password_hash(self.password, password)
 
+    """
+    This method creates a token with JWT.
+    The payload is the User object's username, it expires in 30 minutes.
+    The return value is the token in UTF-8 encoding. 
+    """
     def create_token(self):
         token = jwt.encode({"username":self.username, "exp": datetime.utcnow() + timedelta(minutes=30)}, app.config["SECRET_KEY"])
         return token.decode("UTF-8")
 
+    """
+    This method validates a token.
+    It taken a "token" argument and tries to decode it using JWT.
+    If the token is valid, it returns the User object's username,  otherwise it returns None.
+    """
     @staticmethod
     def validate_token(token):
         try:
@@ -52,6 +81,10 @@ class User(db.Model):
             return None
         
         return current_user  
+
+#Profile Model for the User
+
+##It consists of id, user id, favorite song, album and artist reviews
 
 class Profile(db.Model):
     id = db.Column(db.Integer, primary_key=True)
