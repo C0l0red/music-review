@@ -50,27 +50,32 @@ genre_parser.add_argument("url", type=str, help="URL of Genre resource")
 #genre_parser.add_argument()
 
 def clean_data(data):
-    if artist := data.get("artist"):
+    artist= data.get("artist")
+    if artist:
         artist = Artist.query.filter(Artist.name.ilike(artist)).first_or_404(f"Artist '{artist}' not found")
         data['artist'] = artist
 
-    if album := data.get("album"):
+    album = data.get("album")
+    if album:
         album = artist.albums.filter(Album.name.ilike(album)).first_or_404(f"Album '{album}' by '{artist}' not found")
         #print(album)
         data['album'] = album
 
-    if genre := data.get("genre"):
+    genre = data.get("genre")
+    if genre:
         genre = Genre.query.filter(Genre.name.ilike(genre)).first_or_404(f"Genre '{genre}' not found")
         #print(genre)
         data['genre'] = genre
 
-    if featuring := data.get("featuring"):
+    featuring = data.get("featuring")
+    if featuring:
         for i, artist in enumerate(featuring):
             result = Artist.query.filter(Artist.name.ilike(artist)).first_or_404(f"Artist '{artist}' not found")
             featuring[i] = result
         data["featuring"] = featuring
-    
-    if genres := data.get("genres"):
+
+    genres = data.get("genres")        
+    if genres:
         for i, genre in enumerate(genres):
             result = Genre.query.filter(Genre.name.ilike(genre)).first_or_404(f"Genre '{genre}' not found")
             genres[i] = result
@@ -419,7 +424,7 @@ class GenreListResource(Resource):
 
 
 
-        
+
 """
 def add_metadata(data, Model):
     obj = Model(data)
