@@ -2,6 +2,7 @@ from flask import Flask
 from flask_sqlalchemy import SQLAlchemy
 from flask_login import LoginManager
 from flask_restplus import Api
+import os
 
 
 db = SQLAlchemy()
@@ -16,8 +17,7 @@ def create_app():
 
     db.init_app(app)
     login_manager.init_app(app)
-    #print(app.config)
-    app.config["SQLALCHEMY_DATABASE_URI"] = "sqlite:///database.db"
+    app.config["SQLALCHEMY_DATABASE_URI"] = os.environ.get("DATABASE")
     app.config["SWAGGER_UI_JSONEDITOR"] = True
     #app.config['SQLALCHEMY_ECHO'] = True
 
