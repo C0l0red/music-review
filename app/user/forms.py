@@ -1,3 +1,4 @@
+"""
 from flask_wtf import FlaskForm
 from wtforms import StringField, PasswordField
 from wtforms.validators import Length, DataRequired, EqualTo, ValidationError, Email
@@ -14,4 +15,4 @@ class PasswordChangeForm(FlaskForm):
     def validate_password(self, password):
         if User.check_password(password.data):
             raise ValidationError("Can't use the same password")
-    
+"""

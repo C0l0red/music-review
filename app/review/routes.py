@@ -1,11 +1,13 @@
 from flask import current_app as app, Blueprint, url_for, render_template, redirect
 from flask_login import current_user
 from app import db
-from .forms import AlbumReviewForm, ArtistReviewForm, SongReviewForm
+#from .forms import AlbumReviewForm, ArtistReviewForm, SongReviewForm
 from app.models import ArtistReview, AlbumReview, Genre, SongReview
 
 review = Blueprint("review", __name__)
 
+
+"""
 @review.route("/songs")
 def songs():
     query = Song.query.all()
@@ -108,3 +110,5 @@ def edit_artist_review(name):
         return redirect(url_for("review.artists", name=review))
 
     return render_template("edit-artist-review.html", form=form)
+
+"""

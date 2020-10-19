@@ -1,3 +1,4 @@
+"""
 from flask_wtf import FlaskForm
 from wtforms import StringField, PasswordField, TextAreaField, 
 from wtforms.validators import DataRequired, EqualTo, Length, Email, ValidationError
@@ -47,3 +48,5 @@ class PasswordResetForm(FlaskForm):
     def validate_password(self, password):
         if self.user.check_password(password.data):
             raise ValidationError("Can't use old password")
+
+"""

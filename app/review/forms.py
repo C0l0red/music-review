@@ -1,3 +1,4 @@
+"""
 from flask_wtf import FlaskForm
 from wtforms import StringField, TextAreaField, IntegerField
 from wtforms.validators import DataRequired, Length
@@ -18,4 +19,4 @@ class AlbumReviewForm(FlaskForm):
 class ArtistReviewForm(FlaskForm):
     review = TextAreaField("Review", [Length(min=30)])
     rating = IntegerField("Rating")
-    
+"""

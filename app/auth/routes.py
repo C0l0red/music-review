@@ -1,13 +1,16 @@
 from flask import current_app as app, render_template, redirect, Blueprint, url_for
 from app import db, login_manager
-from .forms import RegisterForm, LoginForm, ResetRequestForm, PasswordResetForm
+#from .forms import RegisterForm, LoginForm, ResetRequestForm, PasswordResetForm
 from flask_login import login_required, login_user, logout_user, current_user
 from app.models import User
-from app.utils import reset_email
+#from app.utils import reset_email
 import jwt
 
 auth = Blueprint("auth", __name__)
 
+
+
+"""
 @auth.route("/register", methods=["GET", "POST"])
 def register():
     form = RegisterForm()
@@ -67,3 +70,4 @@ def reset_password(token):
         return redirect(url_for("auth.login"))
 
     return render_template("reset-password.html", form=form)
+"""
