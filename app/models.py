@@ -1,14 +1,15 @@
-from . import db, api, login_manager
+from . import db, login_manager
 from flask import *
 from uuid import uuid4
 import jwt
-from flask_restplus import fields#, mask
-from flask_restplus.mask import Mask
+#from flask_restplus import fields#, mask
+#from flask_restplus.mask import Mask
 from sqlalchemy.ext.declarative import declared_attr
 from werkzeug.security import generate_password_hash, check_password_hash
 from flask_login import UserMixin
 
 make_uuid = (lambda: uuid4().hex.upper()[0:15])
+
 
 @login_manager.user_loader
 def load_user(user_id):
@@ -51,15 +52,7 @@ class User(db.Model, UserMixin):
     param str email: Email of User
     param str password: Password of User
     """
-
-    expect = api.model("user_expect", {
-        "username": fields.String(description="Username of User"),
-        "email": fields.String(description="Email Address of User"),
-    })
-    serializer = api.clone("user", expect, {
-        "id": fields.String(description="ID of User", attribute="public_id"),
-    })
-
+    
     id = db.Column(db.Integer, primary_key=True)
     public_id = db.Column(db.String(15), default=make_uuid)
     username = db.Column(db.String(50), nullable=False, unique=True)
@@ -139,11 +132,7 @@ class Profile(db.Model):
     """
     param str user_id: User ID of Profile 
     """
-    expect = api.model("profile_expect", {
-        "user": fields.String(description="User ID of Profile"),
-        
-    }
-    )
+    """
     serializer = api.model("profile", {
         "id": fields.String(description="ID of Profile", attribute="public_id"),
         "user": fields.String(description="User ID of Profile"),
@@ -156,6 +145,7 @@ class Profile(db.Model):
         "favorited album reviews": fields.String(description="Album Reviews favorited by Profile", attribute="favorited_album_reviews"),
         "favorited artist reviews": fields.String(description="Artist Reviews favorited by Profile", attribute="favorited_artist_reviews"),
     })
+    """
 
     id = db.Column(db.Integer, primary_key=True)
     user_id = db.Column(db.Integer, db.ForeignKey("user.id"), nullable=False)
@@ -193,6 +183,7 @@ class Song(db.Model):
     param int artist_id: ID of Artist
     param int album_id: ID of Album
     """
+    """
     serializer = api.model("song",{
         "id" : fields.String(description="Public ID of Song", attribute="public_id", readonly=True),
         "name" : fields.String(description="Name of Song"),
@@ -206,6 +197,7 @@ class Song(db.Model):
         "artist": fields.String(description="Artists of Song"),
         "reviews": fields.List(fields.String, description="Reviews of Song", readonly=True),
     })
+    """
     
 
     id = db.Column(db.Integer, primary_key=True)
@@ -253,6 +245,7 @@ class Album(db.Model):
     param Artist artist: Artist of Album
     param Genre genre: Genre of Album
     """
+    """
     serializer = api.model("album",{ 
         "id" : fields.String(description="Public ID of Album", attribute="public_id", readonly=True),
         "name" : fields.String(description="Name of Album"),
@@ -264,6 +257,7 @@ class Album(db.Model):
         "genre": fields.String(description="Genre of Album"),
         "reviews": fields.List(fields.String, description="Reviews of Album", readonly=True),
     })
+    """
     
 
     id = db.Column(db.Integer, primary_key=True)
@@ -301,6 +295,7 @@ class Artist(db.Model):
     param Album albums: Albums by Artist
     param Genre genres: Genres by Artist
     """
+    """
     serializer = api.model("artist",{
         "id" : fields.String(description="Public ID of Artist", attribute="public_id"),
         "name" : fields.String(description="Name of Artist"),
@@ -312,17 +307,18 @@ class Artist(db.Model):
         "genres": fields.List(fields.String, description="Genres of Artist"),
         "reviews": fields.List(fields.String, description="Reviews of Artist"),
     })
+    """
 
 
     id = db.Column(db.Integer, primary_key=True)
     public_id = db.Column(db.String(15), default=make_uuid)
-    name = db.Column(db.String(50), nullable=False)
+    name = db.Column(db.String(50), nullable=False, unique=True)
     url = db.Column(db.String(100), unique=True)
 
     reviews = db.relationship("ArtistReview", backref="artist", lazy="dynamic")
     songs = db.relationship("Song", backref="artist", lazy="dynamic")
     features = db.relationship("Song", secondary='features', backref=db.backref("featuring", lazy="joined"), lazy="dynamic")
-    albums = db.relationship("Album", backref="artist", lazy="dynamic")
+    albums = db.relationship("Album", backref="artist", lazy="dynamic", collection_class=set)
     genres = db.relationship("Genre", secondary="artist_genre", backref=db.backref("artists", lazy="dynamic"), lazy="joined")
 
     def __init__(self, name=None, url=None, songs=None, features=None, albums=None, genres=None):
@@ -345,6 +341,7 @@ class Genre(db.Model):
     param list songs: Songs in Genre
     param list albums: Albums in Genre
     """
+    """
     serializer = api.model("genre", {
         "id" : fields.String(description="Public ID of Genre", attribute="public_id"),
         "name" : fields.String(description="Name of Genre"),
@@ -352,6 +349,7 @@ class Genre(db.Model):
         "songs": fields.List(fields.String, description="Songs in Genre"),
         "albums": fields.List(fields.String, description="Albums in Genre"),
     })
+    """
 
     id = db.Column(db.Integer, primary_key=True)
     public_id = db.Column(db.String(15), default=make_uuid, unique=True)
@@ -374,13 +372,14 @@ class Genre(db.Model):
         return self.name
 
 class BaseReview:
+    """
     mask = Mask("name", skip=True)
     serializer = api.model("review", {
         "id": fields.String(description="ID of Song Review"),
         "review": fields.String(description="Body of Song Review"),
         "users favorited": fields.List(fields.String, description="ID of Profile reviewing Song", attribute="users_favorited")
     })
-
+    """
     id = db.Column(db.Integer, primary_key=True)
     review = db.Column(db.Text, nullable=False)
     metadata_id = db.Column(db.String(200))

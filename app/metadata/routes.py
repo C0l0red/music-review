@@ -1,3 +1,4 @@
+"""
 from flask import current_app as app, url_for, redirect, render_template, Blueprint, request
 from flask_login import current_user
 from app.models import Song, Artist, Album, Genre
@@ -8,16 +9,20 @@ from flask_restplus import Resource, reqparse
 
 
 metadata = Blueprint("metadata", __name__, url_prefix="/metadata")
-
-songs = api.namespace("songs", description="Endpoint to query a Songs")
+"""
+#songs = api.namespace("songs", description="Endpoint to query a Songs")
 #songs = api.namespace("songs", description="Endpoint to query multiple Songs")
-albums = api.namespace("albums", description="Endpoint to query Albums")
-artists = api.namespace("artists", description="Endpoint to query Artists")
-genres = api.namespace("genres", description="Endpoint to query Genres")
+#albums = api.namespace("albums", description="Endpoint to query Albums")
+#artists = api.namespace("artists", description="Endpoint to query Artists")
+#genres = api.namespace("genres", description="Endpoint to query Genres")
 
-lastFM = Instance("lastFM")
+#lastFM = Instance("lastFM")
 
+#song_serializer = Song.serializer
+#album_serializer = Album.serializer
+#artist_serializer = Artist.serializer
 
+"""
 song_parser = reqparse.RequestParser()
 song_parser.add_argument("name", type=str, help="Name of Song")
 song_parser.add_argument("url", type=str, help="URL of Song resource")
@@ -87,7 +92,7 @@ class SingleResource:
 
     def get(self, id):
         obj = self.Model.query.filter_by(public_id=id).first_or_404(f"{self.model} with ID '{id}' not found")
-        return api.marshal(obj, self.Model.serializer, skip_none=True), 200
+        return self.ns.marshal(obj, self.Model.serializer, skip_none=True), 200
 
     def delete(self, id):
         obj = self.Model.query.filter_by(public_id=id).first_or_404(f"{self.model} with ID '{id}' not found.")
@@ -121,7 +126,7 @@ class SingleResource:
         except:
             return {"error": f"Updated values already exist for another {self.model}"}
 
-        return api.marshal(obj, self.Model.serializer, skip_none=True), 200    
+        return self.ns.marshal(obj, self.Model.serializer, skip_none=True), 200    
 
 
 @songs.route("/<id>", endpoint="music")
@@ -140,7 +145,7 @@ class SongResource(Resource, SingleResource):
 
 
     @ns.doc(description="Delte Song using ID")
-    @songs.response(200, "Song deleted successfully")
+    @ns.response(200, "Song deleted successfully")
     def delete(self, id):
         return super(SongResource, self).delete(id)
 
@@ -169,7 +174,7 @@ class SongListResource(Resource):
             artist = Artist.query.filter(Artist.name.ilike(artist)).first_or_404(f"Artist '{artist}' not found.")
             if song:
                 song = artist.songs.filter(Song.name.ilike(song)).first_or_404(f"Song '{song}' not found.")
-                return self.nd.marhsal(song, Song.serializer, skip_none=True), 200
+                return self.ns.marhsal(song, Song.serializer, skip_none=True), 200
 
             songs = artist.songs.query.all()
         elif song:
@@ -182,8 +187,8 @@ class SongListResource(Resource):
         return self.ns.marshal(songs, Song.serializer, skip_none=True), 200
 
     @ns.doc(description="Create Song by sending a JSON object")
-    @songs.expect(parser, validate=True)
-    @songs.response(409, "Duplicate record")
+    @ns.expect(parser, validate=True)
+    @ns.response(409, "Duplicate record")
     @ns.response(201, "Song Created", model=Song.serializer)
     def post(self):
         
@@ -207,6 +212,7 @@ class SongListResource(Resource):
         except:
             return {"error": f"Song {data['name']} already exists"}, 409
         return self.ns.marshal(song, Song.serializer, mask="id, name, artist, features, album, year, url"), 201
+
 
 @albums.route("/<id>")
 @albums.doc(params={"id": "ID of Album"})
@@ -420,8 +426,7 @@ class GenreListResource(Resource):
         except:
             return {"error": f"Genre {data['name']} already exists"}, 409
         return self.ns.marshal(genre, Genre.serializer, skip_none=True, mask="id,name,url"), 201
-
-
+"""
 
 
 

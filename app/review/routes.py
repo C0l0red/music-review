@@ -1,3 +1,4 @@
+"""
 from flask import current_app as app, Blueprint, url_for, render_template, redirect
 from flask_login import current_user
 from app import db
@@ -6,7 +7,7 @@ from app.models import ArtistReview, AlbumReview, Genre, SongReview
 
 review = Blueprint("review", __name__)
 
-
+"""
 """
 @review.route("/songs")
 def songs():
