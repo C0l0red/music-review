@@ -12,7 +12,7 @@ from .apis.users import api as users
 blueprint = Blueprint('alphaV2', __name__, url_prefix='/api/alphaV2')
 api = Api(blueprint,
     title='Music Review API',
-    version='Alpha 2',
+    version='0.1.2',
     description='"Make requests to the Music Review API"',
     # All API metadatas
 )
