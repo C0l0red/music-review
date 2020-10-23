@@ -9,10 +9,10 @@ from .apis.users import api as users
 #from .apis.
 
 
-blueprint = Blueprint('api', __name__, url_prefix='/api/v1')
+blueprint = Blueprint('alphaV2', __name__, url_prefix='/api/alphaV2')
 api = Api(blueprint,
     title='Music Review API',
-    version='0.1.0',
+    version='Alpha 2',
     description='"Make requests to the Music Review API"',
     # All API metadatas
 )

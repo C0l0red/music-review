@@ -1,4 +1,4 @@
-from flask import Flask
+from flask import Flask, redirect, url_for
 from flask_sqlalchemy import SQLAlchemy
 from flask_login import LoginManager
 #from flask_restplus import Api
@@ -26,9 +26,15 @@ def create_app():
     app.cli.add_command(drop_db)
     app.cli.add_command(populate_db)
 
-    from .apiV1 import blueprint as apiV1
+    from .alphaV1 import blueprint as alphaV1
+    from .alphaV2 import blueprint as alphaV2
 
-    app.register_blueprint(apiV1)
+    app.register_blueprint(alphaV1)
+    app.register_blueprint(alphaV2)
+
+    @app.route("/")
+    def index():
+        return redirect(url_for("alphaV2.doc"))
 
     #from .user.routes import user
     #from .auth.routes import auth
