@@ -132,20 +132,6 @@ class Profile(db.Model):
     """
     param str user_id: User ID of Profile 
     """
-    """
-    serializer = api.model("profile", {
-        "id": fields.String(description="ID of Profile", attribute="public_id"),
-        "user": fields.String(description="User ID of Profile"),
-
-        "song reviews": fields.String(description="Song Reviews made by Profile", attribute="song_reviews"),
-        "album reviews": fields.String(description="Album Reviews made by Profile", attribute="album_reviews"),
-        "artist reviews": fields.String(description="Artist Reviews made by Profile", attribute="artist_reviews"),
-
-        "favorited song reviews": fields.String(description="Song Reviews favorited by Profile", attribute="favorited_song_reviews"),
-        "favorited album reviews": fields.String(description="Album Reviews favorited by Profile", attribute="favorited_album_reviews"),
-        "favorited artist reviews": fields.String(description="Artist Reviews favorited by Profile", attribute="favorited_artist_reviews"),
-    })
-    """
 
     id = db.Column(db.Integer, primary_key=True)
     user_id = db.Column(db.Integer, db.ForeignKey("user.id"), nullable=False)
@@ -245,21 +231,7 @@ class Album(db.Model):
     param Artist artist: Artist of Album
     param Genre genre: Genre of Album
     """
-    """
-    serializer = api.model("album",{ 
-        "id" : fields.String(description="Public ID of Album", attribute="public_id", readonly=True),
-        "name" : fields.String(description="Name of Album"),
-        "url" : fields.String(description="URL ID of Album"),
-        "year" : fields.Integer(description="Year of Album", min=1960),
-
-        "artist": fields.String(description="Artist of Album"),
-        "tracks": fields.List(fields.String, description="Tracks on Album"),
-        "genre": fields.String(description="Genre of Album"),
-        "reviews": fields.List(fields.String, description="Reviews of Album", readonly=True),
-    })
-    """
     
-
     id = db.Column(db.Integer, primary_key=True)
     public_id = db.Column(db.String(15), default=make_uuid)
     name = db.Column(db.String(60), nullable=False)
@@ -394,8 +366,9 @@ class BaseReview:
 
 
 class SongReview(db.Model, BaseReview):
-    type = db.Column(db.String(15), default="Song Review")
+    #_type = db.Column(db.String(15), default="Song Review")
     song_id = db.Column(db.Integer, db.ForeignKey("song.id"))
+    album_review_id = db.Column(db.Integer, db.ForeignKey("album_review.id"))
 
     def __init__(self, **kwargs):
         super().__init__(**kwargs)
@@ -409,8 +382,9 @@ class SongReview(db.Model, BaseReview):
         return f"{self.profile}'s Review of {self.song}"
 
 class AlbumReview(db.Model, BaseReview):
-    type = db.Column(db.String(15), default="Album Review")
+    #_type = db.Column(db.String(15), default="Album Review")
     album_id = db.Column(db.Integer, db.ForeignKey("album.id"))
+    track_reviews = db.relationship("SongReview", backref="album_review", lazy='joined')
 
     def __init__(self, **kwargs):
         super().__init__(**kwargs)
@@ -424,7 +398,7 @@ class AlbumReview(db.Model, BaseReview):
 
 
 class ArtistReview(db.Model, BaseReview):
-    type = db.Column(db.String(15), default="Artist Review")
+    #_type = db.Column(db.String(15), default="Artist Review")
     artist_id = db.Column(db.Integer, db.ForeignKey("artist.id"))
 
     def __init__(self, **kwargs):
